@@ -18,7 +18,7 @@
 - [ ] Admin
 ## Installation and Usage
 
->[!note] Dependencies:
+> Dependencies:
 > - mysql-connector-python
 
 1. Clone the repo
