@@ -23,7 +23,6 @@ def create_user(uname,passwd):
     db.commit()
 
 def login(uname,passwd):
-    #if the given uname exists in the users table with the given passwd, the person can access their table with the given uname
     cursor.execute(f"SELECT * FROM users WHERE username = '{uname}' AND password = '{passwd}';")
     if cursor.fetchone() == None:
         print("Invalid credentials")
