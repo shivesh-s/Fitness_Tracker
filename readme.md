@@ -18,11 +18,11 @@
 - [ ] Admin
 ## Installation and Usage
 
-### Dependencies:
-- mysql-connector-python
+>[!] Dependencies:
+> - mysql-connector-python
 
 1. Clone the repo
-`git clone https://github.com/shivesh-s/Fitness_Tracker.git`
+<pre>```git clone https://github.com/shivesh-s/Fitness_Tracker.git```</pre>
 
 2. install the required dependencies
 ```pip install -r requirements.txt```
