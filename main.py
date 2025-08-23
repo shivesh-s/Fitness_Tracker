@@ -16,10 +16,12 @@ print("Connected to:",cursor.fetchone()[0])
 
 cursor.execute("Show tables;")
 print("Tables:")
-for table in cursor:
-    if "users" not in table:
-        cursor.execute("CREATE TABLE users (username VARCHAR(14), password VARCHAR(10));")
 
+if cursor.fetchone() == None:
+    cursor.execute("CREATE TABLE users (username VARCHAR(14), password VARCHAR(10));")
+    print("users table created")
+else:
+    print("error")
 #* Defining some necessary functions
 def create_user():
     '''creates a new user in the database'''
@@ -73,5 +75,23 @@ def oneRM(uname,exercise):
     reps = input("Enter the reps: ")
     rm = round(weight * (36/(37-reps),2)) 
     return rm
-
+run = True
+functions = {
+    "cr_user" : create_user,
+    "login" : login,
+    "add" : add_data,
+    "edit" : edit,
+    "rm_user" : remove_user,
+    "BMI" : BMI,
+    "PR" : PR_logger,
+    "oneRM" : oneRM}
 # UI
+while run:
+    for i in functions:
+        print(i)
+    print("Exit(e)")
+    ch = input("Enter the name of the function: ").lower() 
+    if ch == "e" or ch == "exit":
+        run = False
+    else:
+        functions[ch]()
