@@ -10,7 +10,7 @@ db = mysql.connector.connect(
 
 cursor = db.cursor()
 
-#* pinting working database and its tables
+#* printing working database and its tables
 cursor.execute("SELECT DATABASE()")
 print("Connected to:",cursor.fetchone()[0])
 
