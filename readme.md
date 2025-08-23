@@ -4,7 +4,7 @@
 - the data is stored in local MySQL, using mysql-connector
 
 ## Development Progress
----
+
 - [x] MySQL connection
 	- [x] Login function
 	- [x] User creation
@@ -17,7 +17,7 @@
 - [ ] UI
 - [ ] Admin
 ## Installation and Usage
----
+
 ### Dependencies:
 - mysql-connector-python
 
