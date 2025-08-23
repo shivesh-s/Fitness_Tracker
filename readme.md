@@ -14,7 +14,8 @@
 - [x] BMI Calculator
 - [x] PR Logger
 - [x] 1RM Calculator
-- [ ] UI
+- [x] UI
+- [ ] Better UI
 - [ ] Admin
 ## Installation and Usage
 
