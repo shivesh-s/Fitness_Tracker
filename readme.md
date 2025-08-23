@@ -16,6 +16,7 @@
 - [x] 1RM Calculator
 - [x] UI
 - [ ] Better UI
+- [ ] change parameters into local variables (major error, cannot run the program without doing it, but meh later)
 - [ ] Admin
 ## Installation and Usage
 
