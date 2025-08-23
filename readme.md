@@ -10,7 +10,7 @@
 	- [x] User creation
 	- [x] Data entry
 	- [ ] delete user
-	- [ ] edit existing a data
+	- [ ] edit existing data
 - [ ] BMI Calculator
 - [ ] PR Logger
 - [ ] 1RM Calculator
@@ -22,11 +22,11 @@
 > - mysql-connector-python
 
 1. Clone the repo
-<pre>```git clone https://github.com/shivesh-s/Fitness_Tracker.git```</pre>
+<pre>git clone https://github.com/shivesh-s/Fitness_Tracker.git</pre>
 
 2. install the required dependencies
-```pip install -r requirements.txt```
+<pre>pip install -r requirements.txt</pre>
 
 3. run the main.py file using python
-```cd Fitness_Tracker```
-```python main.py```
+<pre>cd Fitness_Tracker
+python main.py</pre>
