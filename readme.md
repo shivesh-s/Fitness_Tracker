@@ -20,6 +20,8 @@
 - [ ] Admin
 ## Installation and Usage
 
+> Make sure you have mysql in your device
+
 > Dependencies:
 > - mysql-connector-python
 
