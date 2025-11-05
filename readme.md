@@ -16,8 +16,9 @@
 - [x] 1RM Calculator
 - [x] UI
 - [x] Better UI
+- [x] Even better UI
 - [x] change parameters into local variables (major error, cannot run the program without doing it, but meh later)
-- [ ] Admin- halfway through
+- [X] Admin
 ## Installation and Usage
 
 > Make sure you have mysql in your device

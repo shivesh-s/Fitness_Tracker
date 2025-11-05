@@ -1,12 +1,23 @@
 import mysql.connector
 
+print(
+    '''
+-------------------------------------------------------------
+ █▀▀ ▀█▀ ▀█▀ █▀█ █▀▀ █▀▀ █▀▀   ▀█▀ █▀▄ █▀█ █▀▀ █ █ █▀▀ █▀▄
+ █▀▀  █   █  █ █ █▀▀ ▀▀█ ▀▀█    █  █▀▄ █▀█ █   █▀▄ █▀▀ █▀▄   
+ ▀   ▀▀▀  ▀  ▀ ▀ ▀▀▀ ▀▀▀ ▀▀▀    ▀  ▀ ▀ ▀ ▀ ▀▀▀ ▀ ▀ ▀▀▀ ▀ ▀ v1.0
+--------- www.github.com/shivesh-s/fitness_tracker ----------                                                          
+'''
+)
+
+
 UI = """
 Welcome to the Workout Tracker!
 Please choose an option:
 
- +---------------------------------------------+
-| OPTION   | DESCRIPTION                        |
- +---------------------------------------------+
+ +--------- + ---------------------------------+
+| OPTION    | DESCRIPTION                       |
+ +--------- + ---------------------------------+
 | cr_user   | Create a new user                 |
 | add       | Add workout data                  |
 | edit      | Edit workout data                 |
@@ -16,7 +27,7 @@ Please choose an option:
 | onerm     | Calculate One-Rep Max             |
 | admin     | Admin Dashboard                   |
 | exit (e)  | Exit the program                  |
- +---------------------------------------------+
+ +--------- + ---------------------------------+
 """
 
 #* -------------------------------------------------------------
@@ -26,7 +37,7 @@ try:
     db = mysql.connector.connect(
         host="localhost",
         user="root",
-        passwd=input("Enter your MySQL password: "),
+        passwd='root',
         database="workout"
     )
     cursor = db.cursor(buffered=True)
@@ -43,7 +54,7 @@ try:
 
     cursor.execute("SHOW TABLES;")
     r = cursor.fetchall()
-    print("\n------------\nTables:\n------------")
+    print("\n +------------\n| Tables:     |\n +------------")
     if not r:
         # users table stores account and basic physical info
         cursor.execute("""
@@ -60,8 +71,9 @@ try:
         print("users table created.")
     else:
         for i in r:
-            print(i[0])
-        print("------------\n")
+            l = len(i[0])
+            print("| "+i[0] + " " * (12 - l) + "|")
+        print(" +-----------+\n")
 except mysql.connector.Error as err:
     print("Error during initialization:", err)
     exit()
@@ -73,6 +85,7 @@ except mysql.connector.Error as err:
 def create_user(uname, passwd):
     """Create a new user with basic info and their own workout table."""
     try:
+        print("\n"+"---"*7 + 'Creating new user' + "---"*7)
         rm = input("Your previous bench press 1RM in KG (leave blank if none): ")
         rm = int(rm) if rm.strip() else 0
         weight = float(input("Enter your weight in KG: "))
@@ -97,6 +110,7 @@ def create_user(uname, passwd):
         );
         """)
         db.commit()
+        print("---"*8 + 'User Created' + "---"*8 +"\n")
         print("User created successfully.")
         return [uname, passwd]
     except mysql.connector.Error as err:
@@ -212,26 +226,35 @@ def remove_user(uname, passwd):
 
 def admin():
     """Admin dashboard — manage all users, delete users, reset PRs."""
-    admin_pass = input("Enter admin password: ")
+    admin_pass = input("> Enter admin password: ")
     if admin_pass != "admin123":
         print("Invalid admin password.")
         return
     
     while True:
-        print("""
-        Admin Options:
-        1. View all users
-        2. Remove a user
-        3. Reset a user's PRs
-        4. Exit admin
-        """)
-        choice = input("Select option: ").strip()
+        print(r"""
+ +---------------------------------------------+
+|                 ADMIN OPTIONS                 |
+ +---------------------------------------------+
+| 1. View all users                             |
+| 2. Remove a user                              |
+| 3. Reset a user's PRs                         |
+| 4. Exit admin                                 |
+ +---------------------------------------------+
+    """)
+        choice = input("> Select option: ").strip()
         if choice == "1":
             cursor.execute("SELECT username, bench_1rm, weight, height, age, gender FROM users")
             for u in cursor.fetchall():
-                print(u)
+                for i in u:
+                    k = len(str(i))
+                    if u[0] == i:
+                        print("|" + str(i) + " "*(8 - k),end=" | ")
+                    else:
+                        print(i, end=" | ")
+                print()
         elif choice == "2":
-            uname = input("Enter username to remove: ")
+            uname = input("> Enter username to remove: ")
             cursor.execute("DELETE FROM users WHERE username=%s", (uname,))
             cursor.execute(f"DROP TABLE IF EXISTS {uname}")
             db.commit()
@@ -261,9 +284,9 @@ functions = {
 }
 
 run = True
-ut = input("Are you a new user? (y/n): ").lower()
-uname = input("Enter your username: ")
-passwd = input("Enter your password: ")
+ut = input("> Are you a new user? (y/n): ").lower()
+uname = input("> Enter your username: ")
+passwd = input("> Enter your password: ")
 
 # user login or creation
 if ut in ("n", "no"):
@@ -286,7 +309,7 @@ else:
 # main menu loop
 while run:
     print(UI)
-    ch = input("Enter option: ").lower()
+    ch = input("> Enter option: ").lower()
     if ch in ("e", "exit"):
         run = False
     elif ch == "admin":
