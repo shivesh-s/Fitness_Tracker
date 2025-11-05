@@ -21,7 +21,7 @@ Please choose an option:
 | cr_user   | Create a new user                 |
 | add       | Add workout data                  |
 | edit      | Edit workout data                 |
-| rm_user   | Remove a user                     |
+| rm_user   | Remove current user               |
 | bmi       | Calculate BMI                     |
 | pr        | Log Personal Record               |
 | onerm     | Calculate One-Rep Max             |
