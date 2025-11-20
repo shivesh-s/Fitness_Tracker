@@ -142,7 +142,7 @@ def add_data(uname, pwd):
         sets = int(input("Enter sets: "))
         reps = int(input("Enter reps: "))
         weight = float(input("Enter weight used (kg): "))
-        cursor.execute(f"INSERT INTO {uname} VALUES(%s, %s, %s, %s %s, 0)", (date, exercise, sets, reps,weight))
+        cursor.execute(f"INSERT INTO {uname} VALUES(%s, %s, %s, %s, %s, 0)", (date, exercise, sets, reps,weight))
         db.commit()
         print("Data added successfully.")
     except Exception as e:
@@ -150,6 +150,7 @@ def add_data(uname, pwd):
         db.rollback()
 
 
+# -------------------------------------------------------------
 def edit(uname, pwd):
     """Edit a specific entry in the user’s workout log based on date."""
     try:
@@ -231,24 +232,20 @@ def remove_user(uname, passwd):
         db.rollback()
 
 def view(uname, pwd):
-    """View all workout entries for the user."""
+    """View all workout entries for the user as a table."""
     try:
         cursor.execute(f"SELECT * FROM {uname}")
-        records = cursor.fetchall()
-        if not records:
-            print("No workout data found.")
-            return
-        print("\nYour Workout Entries:")
-        print("-----------------------------------------------")
-        print("Date       | Exercise       | Sets | Reps | PR")
-        print("-----------------------------------------------")
-        for row in records:
-            date, exercise, sets, reps, pr = row
-            pr_status = "Yes" if pr else "No"
-            print(f"{date} | {exercise:14} | {sets:4} | {reps:4} | {pr_status}")
-        print("-----------------------------------------------")
+        rows = cursor.fetchall()
+        print("\n"+" "+"---"*9 + 'Workout Entries' + "---"*8)
+        print("| Date       | Exercise           | Sets | Reps | Weight (kg) | PR |")
+        print("+" + "-"*11 + "+" + "-"*20 + "+" + "-"*6 + "+" + "-"*6 + "+" + "-"*13 + "+" + "-"*4 + "+")
+        for row in rows:
+            date, exercise, sets, reps, weight, pr = row
+            pr_str = "Yes" if pr else "No"
+            print(f"| {date} | {exercise:<18} | {sets:<4} | {reps:<4} | {weight:<11} | {pr_str:<2} |")
+        print(" "+"---"*9 + 'End of Entries-' + "---"*8 +"\n")
     except mysql.connector.Error as err:
-        print("Error viewing data:", err)
+        print("Error viewing entries:", err)
 
 def admin():
     """Admin dashboard — manage all users, delete users, reset PRs."""
