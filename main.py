@@ -281,6 +281,13 @@ def admin():
                 print()
         elif choice == "2":
             uname = input("> Enter username to remove: ")
+            if uname == "admin":
+                print("Cannot remove admin user.")
+                continue
+            cursor.execute("SELECT * FROM users WHERE username=%s", (uname,))
+            if not cursor.fetchone():
+                print("User not found.")
+                continue
             cursor.execute("DELETE FROM users WHERE username=%s", (uname,))
             cursor.execute(f"DROP TABLE IF EXISTS {uname}")
             db.commit()
