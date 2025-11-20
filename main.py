@@ -224,6 +224,8 @@ def remove_user(uname, passwd):
         cursor.execute(f"DROP TABLE IF EXISTS {uname}")
         db.commit()
         print("User removed successfully.")
+        global run
+        run=False
     except mysql.connector.Error as err:
         print("Error removing user:", err)
         db.rollback()
