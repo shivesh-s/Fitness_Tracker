@@ -12,7 +12,7 @@ print(
 
 
 UI = """
-Welcome to the Workout Tracker!
+
 Please choose an option:
 
  +--------- + ---------------------------------+
@@ -21,10 +21,11 @@ Please choose an option:
 | cr_user   | Create a new user                 |
 | add       | Add workout data                  |
 | edit      | Edit workout data                 |
-| rm_user   | Remove a user                     |
+| rm_user   | Remove current user               |
 | bmi       | Calculate BMI                     |
 | pr        | Log Personal Record               |
-| onerm     | Calculate One-Rep Max             |
+| onerm     | Calculate 1 Rep Max for benchpress|
+| view      | View workout entries              |
 | admin     | Admin Dashboard                   |
 | exit (e)  | Exit the program                  |
  +--------- + ---------------------------------+
@@ -106,6 +107,7 @@ def create_user(uname, passwd):
             exercise VARCHAR(255),
             sets INT,
             reps INT,
+            weight DECIMAL(5,2),
             PR BOOLEAN NOT NULL DEFAULT 0
         );
         """)
@@ -139,7 +141,8 @@ def add_data(uname, pwd):
         exercise = input("Enter the exercise name: ")
         sets = int(input("Enter sets: "))
         reps = int(input("Enter reps: "))
-        cursor.execute(f"INSERT INTO {uname} VALUES(%s, %s, %s, %s, 0)", (date, exercise, sets, reps))
+        weight = float(input("Enter weight used (kg): "))
+        cursor.execute(f"INSERT INTO {uname} VALUES(%s, %s, %s, %s, %s, 0)", (date, exercise, sets, reps,weight))
         db.commit()
         print("Data added successfully.")
     except Exception as e:
@@ -147,6 +150,7 @@ def add_data(uname, pwd):
         db.rollback()
 
 
+# -------------------------------------------------------------
 def edit(uname, pwd):
     """Edit a specific entry in the user’s workout log based on date."""
     try:
@@ -154,7 +158,8 @@ def edit(uname, pwd):
         exercise = input("Enter new exercise name: ")
         sets = int(input("Enter new sets: "))
         reps = int(input("Enter new reps: "))
-        cursor.execute(f"UPDATE {uname} SET exercise=%s, sets=%s, reps=%s WHERE date=%s", (exercise, sets, reps, date))
+        weight = float(input("Enter new weight used (kg): "))
+        cursor.execute(f"UPDATE {uname} SET exercise=%s, sets=%s, reps=%s, weight=%s WHERE date=%s", (exercise, sets, reps,weight, date))
         db.commit()
         print("Entry updated successfully.")
     except mysql.connector.Error as err:
@@ -180,7 +185,7 @@ def BMI(user, pwd):
 def oneRM(uname, pwd):
     """Calculate 1-rep max using the Epley formula and update user data."""
     try:
-        weight = float(input("Enter the weight lifted (kg): "))
+        weight = float(input("Enter the weight you benched (kg): "))
         reps = int(input("Enter the reps: "))
         rm = round(weight * (36 / (37 - reps)), 2)
         cursor.execute("UPDATE users SET bench_1rm=%s WHERE username=%s", (rm, uname))
@@ -198,13 +203,14 @@ def PR_logger(uname, pwd):
         date = input("Enter the date (YYYY-MM-DD): ")
         exercise = input("Enter the exercise name: ")
         sets, reps = int(input("Sets: ")), int(input("Reps: "))
+        weight = float(input("Weight used (kg): "))
 
         # If PR exists for that exercise, update it. Else, create new.
         cursor.execute(f"SELECT * FROM {uname} WHERE exercise=%s AND PR=1", (exercise,))
         if cursor.fetchone():
-            cursor.execute(f"UPDATE {uname} SET date=%s, sets=%s, reps=%s WHERE exercise=%s AND PR=1", (date, sets, reps, exercise))
+            cursor.execute(f"UPDATE {uname} SET date=%s, sets=%s, reps=%s , weight=%s WHERE exercise=%s AND PR=1", (date, sets, reps, weight, exercise))
         else:
-            cursor.execute(f"INSERT INTO {uname} VALUES(%s, %s, %s, %s, 1)", (date, exercise, sets, reps))
+            cursor.execute(f"INSERT INTO {uname} VALUES(%s, %s, %s, %s,%s, 1)", (date, exercise, sets, reps, weight))
         db.commit()
         print("PR logged successfully.")
     except Exception as e:
@@ -219,10 +225,27 @@ def remove_user(uname, passwd):
         cursor.execute(f"DROP TABLE IF EXISTS {uname}")
         db.commit()
         print("User removed successfully.")
+        global run
+        run=False
     except mysql.connector.Error as err:
         print("Error removing user:", err)
         db.rollback()
 
+def view(uname, pwd):
+    """View all workout entries for the user as a table."""
+    try:
+        cursor.execute(f"SELECT * FROM {uname}")
+        rows = cursor.fetchall()
+        print("\n"+" "+"---"*9 + 'Workout Entries' + "---"*8)
+        print("| Date       | Exercise           | Sets | Reps | Weight (kg) | PR |")
+        print("+" + "-"*11 + "+" + "-"*20 + "+" + "-"*6 + "+" + "-"*6 + "+" + "-"*13 + "+" + "-"*4 + "+")
+        for row in rows:
+            date, exercise, sets, reps, weight, pr = row
+            pr_str = "Yes" if pr else "No"
+            print(f"| {date} | {exercise:<18} | {sets:<4} | {reps:<4} | {weight:<11} | {pr_str:<2} |")
+        print(" "+"---"*9 + 'End of Entries-' + "---"*8 +"\n")
+    except mysql.connector.Error as err:
+        print("Error viewing entries:", err)
 
 def admin():
     """Admin dashboard — manage all users, delete users, reset PRs."""
@@ -255,6 +278,13 @@ def admin():
                 print()
         elif choice == "2":
             uname = input("> Enter username to remove: ")
+            if uname == "admin":
+                print("Cannot remove admin user.")
+                continue
+            cursor.execute("SELECT * FROM users WHERE username=%s", (uname,))
+            if not cursor.fetchone():
+                print("User not found.")
+                continue
             cursor.execute("DELETE FROM users WHERE username=%s", (uname,))
             cursor.execute(f"DROP TABLE IF EXISTS {uname}")
             db.commit()
@@ -280,6 +310,7 @@ functions = {
     "bmi": BMI,
     "pr": PR_logger,
     "onerm": oneRM,
+    "view": view,
     "rm_user": remove_user
 }
 
@@ -307,6 +338,7 @@ else:
         run = False
 
 # main menu loop
+print("Welcome to the Workout Tracker!")
 while run:
     print(UI)
     ch = input("> Enter option: ").lower()
@@ -318,3 +350,7 @@ while run:
         functions[ch](uname, passwd)
     else:
         print("Invalid option.")
+
+cursor.close()
+db.close()
+print("Exiting Workout Tracker. Goodbye!")
